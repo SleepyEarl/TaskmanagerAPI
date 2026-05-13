@@ -1,25 +1,19 @@
-import express from 'express';
-import cors from 'cors';
-import bodyParser from 'body-parser';
-
+const express = require('express');
+const cors = require('cors');
 const app = express();
 const PORT = 3000;
 
 app.use(cors());
-app.use(bodyParser.json());
+app.use(express.json());
 
 let tasks = [];
 let categories = ["Personal", "Work", "Urgent"];
 
-function findTaskIndex(id) {
-    return tasks.findIndex(t => t.id === id);
-}
-
-app.get('/tasks', (req, res) => {
+app.get('/api/tasks', (req, res) => {
     res.json(tasks);
 });
 
-app.post('/tasks', (req, res) => {
+app.post('/api/tasks', (req, res) => {
     const { text, category, remainingTime } = req.body;
     if (!text) return res.status(400).json({ error: "Task text is required" });
     const newTask = {
@@ -35,26 +29,26 @@ app.post('/tasks', (req, res) => {
     res.status(201).json(newTask);
 });
 
-app.put('/tasks/:id', (req, res) => {
-    const id = Number(req.params.id);
-    const index = findTaskIndex(id);
+app.put('/api/tasks/:id', (req, res) => {
+    const { id } = req.params;
+    const index = tasks.findIndex(t => t.id == id);
     if (index === -1) return res.status(404).json({ error: "Task not found" });
     tasks[index] = { ...tasks[index], ...req.body };
     res.json(tasks[index]);
 });
 
-app.delete('/tasks/:id', (req, res) => {
-    const id = Number(req.params.id);
-    const index = findTaskIndex(id);
+app.delete('/api/tasks/:id', (req, res) => {
+    const { id } = req.params;
+    const index = tasks.findIndex(t => t.id == id);
     if (index === -1) return res.status(404).json({ error: "Task not found" });
-    const deleted = tasks.splice(index, 1);
-    res.json(deleted[0]);
+    tasks.splice(index, 1);
+    res.status(204).send();
 });
 
-app.get('/categories', (req, res) => {
+app.get('/api/categories', (req, res) => {
     res.json(categories);
 });
 
 app.listen(PORT, () => {
-    console.log(`API running at http://localhost:${PORT}`);
+    console.log(`Server running on http://localhost:${PORT}`);
 });
