@@ -9,6 +9,10 @@ app.use(express.json());
 let tasks = [];
 let categories = ["Personal", "Work", "Urgent"];
 
+app.get('/', (req, res) => {
+    res.send('Task API is running. Use /api/tasks or /api/categories');
+});
+
 app.get('/api/tasks', (req, res) => {
     res.json(tasks);
 });
